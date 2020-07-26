@@ -24,3 +24,9 @@ export const deleteRepository = {
     repository_id: Joi.string().uuid().required(),
   }),
 };
+
+export const createLike = {
+  params: Joi.object({
+    repository_id: Joi.string().uuid().required(),
+  }),
+};

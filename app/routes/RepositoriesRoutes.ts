@@ -1,5 +1,4 @@
 import express from "express";
-import HTTPStatusCodes from "http-status-codes";
 
 import RepositoriesController from "../controllers/RepositoriesController";
 
@@ -7,9 +6,9 @@ import {
   createRepository,
   updateRepository,
   deleteRepository,
+  createLike,
 } from "../schemas/RepositorySchema";
 import validateRequestMiddleware from "../middlewares/validate-request-middleware";
-import deletesSqls from "../sqls/deletes";
 
 class RepositoriesRoutes {
   public mainRoutes: express.Router;
@@ -42,9 +41,11 @@ class RepositoriesRoutes {
       validateRequestMiddleware(deleteRepository, "params"),
       RepositoriesControllerInstance.deleteRepository
     );
-    this.mainRoutes.post("/:repository_id/like", (req, res) => {
-      return res.status(HTTPStatusCodes.CREATED).send();
-    });
+    this.mainRoutes.post(
+      "/:repository_id/like",
+      validateRequestMiddleware(createLike, "params"),
+      RepositoriesControllerInstance.createLike
+    );
   }
 }
 

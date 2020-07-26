@@ -39,11 +39,6 @@ export default class RepositoriesController implements IRepositoriesController {
             }
           );
 
-          // await RepositoriesRepositoryInstance.insertLike(
-          //   CONN,
-          //   repositoryCreated.id
-          // );
-
           techsCreated = await RepositoriesRepositoryInstance.insertTechs(
             CONN,
             repositoryCreated.id,
@@ -208,5 +203,46 @@ export default class RepositoriesController implements IRepositoriesController {
     );
 
     return res.status(HTTPStatusCodes.NO_CONTENT).json();
+  }
+
+  public async createLike(
+    req: Request,
+    res: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<Response<any>> {
+    const { repository_id } = req.params;
+
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    const RepositoriesRepositoryInstance = new RepositoriesRepository();
+
+    const responseFunction = await DatabaseRepositoryInstance.executeWithDatabase(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (CONN: any) => {
+        let responseRepository;
+        try {
+          await DatabaseRepositoryInstance.startTransaction(CONN);
+          const checkRepository = await RepositoriesRepositoryInstance.getRepository(
+            CONN,
+            repository_id
+          );
+          if (!checkRepository) {
+            throw new CustomNotFoundError("repository not found");
+          }
+          responseRepository = await RepositoriesRepositoryInstance.insertLike(
+            CONN,
+            repository_id
+          );
+
+          await DatabaseRepositoryInstance.commit(CONN);
+        } catch (err) {
+          await DatabaseRepositoryInstance.rollback(CONN);
+          throw err;
+        }
+
+        return responseRepository;
+      }
+    );
+
+    return res.status(HTTPStatusCodes.CREATED).json(responseFunction);
   }
 }

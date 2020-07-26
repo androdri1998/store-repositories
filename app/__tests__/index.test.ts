@@ -1,6 +1,5 @@
 import request from "supertest";
 import { v4 as uuidV4 } from "uuid";
-import faker from "faker";
 
 import App from "../App";
 import truncateTables from "./utils/truncateTables";
@@ -67,6 +66,7 @@ describe("Store repositories", () => {
 
     expect(response.status).toBe(404);
   });
+
   it("should not be able to update repository likes manually", async () => {
     const AppInstace = new App();
     const repository = await request(AppInstace.express)
@@ -103,10 +103,26 @@ describe("Store repositories", () => {
 
     expect(response.status).toBe(404);
   });
+
   it("should be able to give a like to the repository", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const repository = await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+
+    const response = await request(AppInstace.express).post(
+      `/repositories/${repository.body.id}/like`
+    );
+
+    expect(response.status).toBe(201);
   });
+
   it("should not be able to like a repository that does not exist", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const response = await request(AppInstace.express).post(
+      `/repositories/${uuidV4()}/like`
+    );
+
+    expect(response.status).toBe(404);
   });
 });
