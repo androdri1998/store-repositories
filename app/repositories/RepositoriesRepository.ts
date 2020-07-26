@@ -203,4 +203,49 @@ export default class RepositoriesRepository {
 
     return true;
   }
+
+  public async deleteRepository(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    await DatabaseRepositoryInstance.query(
+      CONN,
+      deletesSqls.DELETE_REPOSITORY_BY_ID,
+      [repositoryId]
+    );
+
+    return true;
+  }
+
+  public async deleteLikes(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    await DatabaseRepositoryInstance.query(
+      CONN,
+      deletesSqls.DELETE_LIKES_BY_REPOSITORY_ID,
+      [repositoryId]
+    );
+
+    return true;
+  }
+
+  public async deleteTechs(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    await DatabaseRepositoryInstance.query(
+      CONN,
+      deletesSqls.DELETE_TECHS_BY_REPOSITORY_ID,
+      [repositoryId]
+    );
+
+    return true;
+  }
 }

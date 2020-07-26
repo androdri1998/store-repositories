@@ -18,3 +18,9 @@ export const updateRepository = {
     techs: Joi.array().items(Joi.string()).min(1),
   }),
 };
+
+export const deleteRepository = {
+  params: Joi.object({
+    repository_id: Joi.string().uuid().required(),
+  }),
+};

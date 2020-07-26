@@ -6,8 +6,10 @@ import RepositoriesController from "../controllers/RepositoriesController";
 import {
   createRepository,
   updateRepository,
+  deleteRepository,
 } from "../schemas/RepositorySchema";
 import validateRequestMiddleware from "../middlewares/validate-request-middleware";
+import deletesSqls from "../sqls/deletes";
 
 class RepositoriesRoutes {
   public mainRoutes: express.Router;
@@ -35,9 +37,11 @@ class RepositoriesRoutes {
       ],
       RepositoriesControllerInstance.updateRepository
     );
-    this.mainRoutes.delete("/:repository_id", (req, res) => {
-      return res.status(HTTPStatusCodes.NO_CONTENT).send();
-    });
+    this.mainRoutes.delete(
+      "/:repository_id",
+      validateRequestMiddleware(deleteRepository, "params"),
+      RepositoriesControllerInstance.deleteRepository
+    );
     this.mainRoutes.post("/:repository_id/like", (req, res) => {
       return res.status(HTTPStatusCodes.CREATED).send();
     });

@@ -69,24 +69,39 @@ describe("Store repositories", () => {
   });
   it("should not be able to update repository likes manually", async () => {
     const AppInstace = new App();
+    const repository = await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
 
-    // const repository = await request(AppInstace.express)
-    //   .post("/repositories")
-    //   .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+    const response = await request(AppInstace.express)
+      .put(`/repositories/${repository.body.id}`)
+      .send({
+        like: 10,
+      });
 
-    // const response = await request(AppInstace.express)
-    //   .put(`/repositories/${repository.body.id}`)
-    //   .send({
-    //     like: 10,
-    //   });
-
-    expect(400).toBe(400);
+    expect(response.status).toBe(400);
   });
+
   it("should be able to delete the repository", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const repository = await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+
+    const response = await request(AppInstace.express).delete(
+      `/repositories/${repository.body.id}`
+    );
+
+    expect(response.status).toBe(204);
   });
+
   it("should not be able to delete a repository that does not exist", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const response = await request(AppInstace.express).delete(
+      `/repositories/${uuidV4()}`
+    );
+
+    expect(response.status).toBe(404);
   });
   it("should be able to give a like to the repository", async () => {
     expect(1 + 1).toBe(2);

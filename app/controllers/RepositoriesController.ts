@@ -63,7 +63,7 @@ export default class RepositoriesController implements IRepositoriesController {
         };
       }
     );
-    return res.status(HTTPStatusCodes.CREATED).send(responseFunction);
+    return res.status(HTTPStatusCodes.CREATED).json(responseFunction);
   }
 
   public async listRepositories(
@@ -105,7 +105,7 @@ export default class RepositoriesController implements IRepositoriesController {
         return serializedRepositories;
       }
     );
-    return res.status(HTTPStatusCodes.OK).send(responseFunction);
+    return res.status(HTTPStatusCodes.OK).json(responseFunction);
   }
 
   public async updateRepository(
@@ -164,6 +164,49 @@ export default class RepositoriesController implements IRepositoriesController {
       }
     );
 
-    return res.status(HTTPStatusCodes.OK).send(responseFunction);
+    return res.status(HTTPStatusCodes.OK).json(responseFunction);
+  }
+
+  public async deleteRepository(
+    req: Request,
+    res: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<Response<any>> {
+    const { repository_id } = req.params;
+
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    const RepositoriesRepositoryInstance = new RepositoriesRepository();
+
+    await DatabaseRepositoryInstance.executeWithDatabase(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (CONN: any) => {
+        let responseRepository;
+        try {
+          await DatabaseRepositoryInstance.startTransaction(CONN);
+          const checkRepository = await RepositoriesRepositoryInstance.getRepository(
+            CONN,
+            repository_id
+          );
+          if (!checkRepository) {
+            throw new CustomNotFoundError("repository not found");
+          }
+          await RepositoriesRepositoryInstance.deleteRepository(
+            CONN,
+            repository_id
+          );
+          await RepositoriesRepositoryInstance.deleteTechs(CONN, repository_id);
+          await RepositoriesRepositoryInstance.deleteLikes(CONN, repository_id);
+
+          await DatabaseRepositoryInstance.commit(CONN);
+        } catch (err) {
+          await DatabaseRepositoryInstance.rollback(CONN);
+          throw err;
+        }
+
+        return responseRepository;
+      }
+    );
+
+    return res.status(HTTPStatusCodes.NO_CONTENT).json();
   }
 }
