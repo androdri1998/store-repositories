@@ -1,4 +1,5 @@
-# store-repositories
+# store-repositories  
+This is a study application of TypeScript and Node.js, have as goal to store repositories and the capacity of give likes to repository.
 
 ## Required
 There's a file name as `.env.stage.example` with the variables that need to be createds in a file called as `.env.[stage]`:
