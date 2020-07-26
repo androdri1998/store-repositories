@@ -6,6 +6,15 @@ const selectsSqls: ISelectsSqls = {
   SELECT_MIGRATE_VERSION: `
     SELECT version FROM ${databaseTables.migrateVersions} WHERE version = ?;
   `,
+  SELECT_REPOSITORIES: `
+    SELECT * FROM ${databaseTables.repositories};
+  `,
+  SELECT_COUNT_LIKES_BY_REPOSITORY_ID: `
+    SELECT count(id) total FROM ${databaseTables.likes} WHERE repository_id = ?;
+  `,
+  SELECT_TECHS_BY_REPOSITORY_ID: `
+    SELECT * FROM ${databaseTables.techs} WHERE repository_id = ?;
+  `,
 };
 
 export default selectsSqls;

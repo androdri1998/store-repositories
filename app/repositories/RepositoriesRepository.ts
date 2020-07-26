@@ -5,6 +5,7 @@ import moment from "moment";
 import DatabaseRepository from "./DatabaseRepository";
 
 import insertsSqls from "../sqls/inserts";
+import selectsSqls from "../sqls/selects";
 
 import {
   IRepository,
@@ -95,5 +96,51 @@ export default class RepositoriesRepository {
     );
 
     return techsCreateds;
+  }
+
+  public async getRepositories(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+
+    const repositories = await DatabaseRepositoryInstance.query(
+      CONN,
+      selectsSqls.SELECT_REPOSITORIES
+    );
+
+    return repositories;
+  }
+
+  public async getCountLikes(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+
+    const [likesTotal] = await DatabaseRepositoryInstance.query(
+      CONN,
+      selectsSqls.SELECT_COUNT_LIKES_BY_REPOSITORY_ID,
+      [repositoryId]
+    );
+
+    return likesTotal.total;
+  }
+
+  public async getTechs(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+
+    const techs = await DatabaseRepositoryInstance.query(
+      CONN,
+      selectsSqls.SELECT_TECHS_BY_REPOSITORY_ID,
+      [repositoryId]
+    );
+
+    return techs;
   }
 }

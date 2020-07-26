@@ -1,4 +1,7 @@
 export interface ISelectsSqls {
   SELECT_MIGRATE_VERSION: string;
   SELECT_TABLE_MYSQL: string;
+  SELECT_REPOSITORIES: string;
+  SELECT_COUNT_LIKES_BY_REPOSITORY_ID: string;
+  SELECT_TECHS_BY_REPOSITORY_ID: string;
 }

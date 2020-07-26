@@ -19,7 +19,21 @@ describe("Store repositories", () => {
   });
 
   it("should be able to list the repositories", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+
+    await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+    await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 2", url: "url 2", techs: ["typescript"] });
+    await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 3", url: "url 3", techs: ["typescript"] });
+
+    const response = await request(AppInstace.express).get("/repositories");
+
+    expect(response.status).toBe(200);
   });
   it("should be able to update repository", async () => {
     expect(1 + 1).toBe(2);

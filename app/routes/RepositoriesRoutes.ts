@@ -23,9 +23,7 @@ class RepositoriesRoutes {
       validateRequestMiddleware(createRepository, "body"),
       RepositoriesControllerInstance.createRepository
     );
-    this.mainRoutes.get("/", (req, res) => {
-      return res.status(HTTPStatusCodes.OK).send();
-    });
+    this.mainRoutes.get("/", RepositoriesControllerInstance.listRepositories);
     this.mainRoutes.put("/:repository_id", (req, res) => {
       return res.status(HTTPStatusCodes.OK).send();
     });

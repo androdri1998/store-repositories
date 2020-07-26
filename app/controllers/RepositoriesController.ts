@@ -4,10 +4,13 @@ import HTTPStatusCodes from "http-status-codes";
 import DatabaseRepository from "../repositories/DatabaseRepository";
 import RepositoriesRepository from "../repositories/RepositoriesRepository";
 
-import { IIRepositoriesController } from "./RepositoriesController-types";
+import {
+  IRepositoriesController,
+  IRepository,
+  ITech,
+} from "./RepositoriesController-types";
 
-export default class RepositoriesController
-  implements IIRepositoriesController {
+export default class RepositoriesController implements IRepositoriesController {
   public async createRepository(
     req: Request,
     res: Response
@@ -60,5 +63,46 @@ export default class RepositoriesController
       }
     );
     return res.status(HTTPStatusCodes.CREATED).send(responseFunction);
+  }
+  public async listRepositories(
+    req: Request,
+    res: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<Response<any>> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    const RepositoriesRepositoryInstance = new RepositoriesRepository();
+    const responseFunction = await DatabaseRepositoryInstance.executeWithDatabase(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (CONN: any) => {
+        const repositories = await RepositoriesRepositoryInstance.getRepositories(
+          CONN
+        );
+
+        const serializedRepositories = await Promise.all(
+          repositories.map(async (repository: IRepository) => {
+            const totalLikes = await RepositoriesRepositoryInstance.getCountLikes(
+              CONN,
+              repository.id
+            );
+
+            const techsCreated = await RepositoriesRepositoryInstance.getTechs(
+              CONN,
+              repository.id
+            );
+
+            const responseRepository = {
+              ...repository,
+              likes: totalLikes,
+              techs: techsCreated.map((tech: ITech) => tech.tech),
+            };
+
+            return responseRepository;
+          })
+        );
+
+        return serializedRepositories;
+      }
+    );
+    return res.status(HTTPStatusCodes.OK).send(responseFunction);
   }
 }
