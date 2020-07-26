@@ -22,3 +22,9 @@ export interface ITechCreated {
   tech: string;
   created_at: string;
 }
+
+export interface IParamsUpdateRepository {
+  title?: string;
+  url?: string;
+  techs?: string[];
+}

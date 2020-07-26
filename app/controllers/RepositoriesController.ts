@@ -3,6 +3,7 @@ import HTTPStatusCodes from "http-status-codes";
 
 import DatabaseRepository from "../repositories/DatabaseRepository";
 import RepositoriesRepository from "../repositories/RepositoriesRepository";
+import { CustomNotFoundError } from "../utils/Errors";
 
 import {
   IRepositoriesController,
@@ -38,10 +39,10 @@ export default class RepositoriesController implements IRepositoriesController {
             }
           );
 
-          await RepositoriesRepositoryInstance.insertLike(
-            CONN,
-            repositoryCreated.id
-          );
+          // await RepositoriesRepositoryInstance.insertLike(
+          //   CONN,
+          //   repositoryCreated.id
+          // );
 
           techsCreated = await RepositoriesRepositoryInstance.insertTechs(
             CONN,
@@ -64,6 +65,7 @@ export default class RepositoriesController implements IRepositoriesController {
     );
     return res.status(HTTPStatusCodes.CREATED).send(responseFunction);
   }
+
   public async listRepositories(
     req: Request,
     res: Response
@@ -103,6 +105,65 @@ export default class RepositoriesController implements IRepositoriesController {
         return serializedRepositories;
       }
     );
+    return res.status(HTTPStatusCodes.OK).send(responseFunction);
+  }
+
+  public async updateRepository(
+    req: Request,
+    res: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<Response<any>> {
+    const { repository_id } = req.params;
+    const { title, url, techs } = req.body;
+
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+    const RepositoriesRepositoryInstance = new RepositoriesRepository();
+
+    const responseFunction = await DatabaseRepositoryInstance.executeWithDatabase(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (CONN: any) => {
+        let responseRepository;
+        try {
+          await DatabaseRepositoryInstance.startTransaction(CONN);
+          const checkRepository = await RepositoriesRepositoryInstance.getRepository(
+            CONN,
+            repository_id
+          );
+          if (!checkRepository) {
+            throw new CustomNotFoundError("repository not found");
+          }
+          await RepositoriesRepositoryInstance.updateRepository(
+            CONN,
+            repository_id,
+            { title, url, techs }
+          );
+          const repository = await RepositoriesRepositoryInstance.getRepository(
+            CONN,
+            repository_id
+          );
+          const totalLikes = await RepositoriesRepositoryInstance.getCountLikes(
+            CONN,
+            repository.id
+          );
+          const techsCreated = await RepositoriesRepositoryInstance.getTechs(
+            CONN,
+            repository.id
+          );
+          responseRepository = {
+            ...repository,
+            likes: totalLikes,
+            techs: techsCreated.map((tech: ITech) => tech.tech),
+          };
+          await DatabaseRepositoryInstance.commit(CONN);
+        } catch (err) {
+          await DatabaseRepositoryInstance.rollback(CONN);
+          throw err;
+        }
+
+        return responseRepository;
+      }
+    );
+
     return res.status(HTTPStatusCodes.OK).send(responseFunction);
   }
 }

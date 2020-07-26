@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 export interface IRepositoriesController {
   createRepository: (req: Request, res: Response) => Promise<Response<any>>;
   listRepositories: (req: Request, res: Response) => Promise<Response<any>>;
+  updateRepository: (req: Request, res: Response) => Promise<Response<any>>;
 }
 
 export interface IRepository {

@@ -6,12 +6,15 @@ import DatabaseRepository from "./DatabaseRepository";
 
 import insertsSqls from "../sqls/inserts";
 import selectsSqls from "../sqls/selects";
+import updatesSqls from "../sqls/updates";
+import deletesSqls from "../sqls/deletes";
 
 import {
   IRepository,
   IRepositoryCreated,
   ILikeCreated,
   ITechCreated,
+  IParamsUpdateRepository,
 } from "./RepositoriesRepository-types";
 
 export default class RepositoriesRepository {
@@ -112,6 +115,22 @@ export default class RepositoriesRepository {
     return repositories;
   }
 
+  public async getRepository(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+
+    const repositoryArr = await DatabaseRepositoryInstance.query(
+      CONN,
+      selectsSqls.SELECT_REPOSITORY_BY_ID,
+      [repositoryId]
+    );
+
+    return repositoryArr[0];
+  }
+
   public async getCountLikes(
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     CONN: any,
@@ -142,5 +161,46 @@ export default class RepositoriesRepository {
     );
 
     return techs;
+  }
+
+  public async updateRepository(
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    CONN: any,
+    repositoryId: string,
+    values: IParamsUpdateRepository
+  ): Promise<any> {
+    const DatabaseRepositoryInstance = new DatabaseRepository();
+
+    const sets = [];
+    if (values.url) {
+      sets.push(`url = ${CONN.escape(values.url)}`);
+    }
+
+    if (values.title) {
+      sets.push(`title = ${CONN.escape(values.title)}`);
+    }
+
+    if (values.techs && values.techs?.length > 0) {
+      await DatabaseRepositoryInstance.query(
+        CONN,
+        deletesSqls.DELETE_TECHS_BY_REPOSITORY_ID,
+        [repositoryId]
+      );
+
+      await this.insertTechs(CONN, repositoryId, values.techs);
+    }
+
+    if (sets.length > 0) {
+      const HANDLE_UPDATE_REPOSITORIE = updatesSqls.UPDATE_REPOSITORY.replace(
+        ":sets",
+        sets.join(", ")
+      );
+
+      await DatabaseRepositoryInstance.query(CONN, HANDLE_UPDATE_REPOSITORIE, [
+        repositoryId,
+      ]);
+    }
+
+    return true;
   }
 }

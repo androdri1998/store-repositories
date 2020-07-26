@@ -7,3 +7,14 @@ export const createRepository = {
     techs: Joi.array().items(Joi.string()).min(1).required(),
   }),
 };
+
+export const updateRepository = {
+  params: Joi.object({
+    repository_id: Joi.string().uuid().required(),
+  }),
+  body: Joi.object({
+    title: Joi.string(),
+    url: Joi.string(),
+    techs: Joi.array().items(Joi.string()).min(1),
+  }),
+};

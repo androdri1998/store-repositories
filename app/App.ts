@@ -11,6 +11,7 @@ dotenv.config({
 });
 
 import errorMiddleware from "./middlewares/error-middleware";
+import logRequests from "./middlewares/logRequest";
 import RepositoriesRoutes from "./routes/RepositoriesRoutes";
 
 class App {
@@ -28,6 +29,7 @@ class App {
     this.express.use(cors());
     this.express.use(express.json());
     this.express.use(helmet());
+    this.express.use(logRequests);
   }
 
   private routes(): void {
@@ -36,7 +38,7 @@ class App {
   }
 
   private middlewaresErrors(): void {
-    this.express.use(errorMiddleware());
+    this.express.use(errorMiddleware);
   }
 }
 

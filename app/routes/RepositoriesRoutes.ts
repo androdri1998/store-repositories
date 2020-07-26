@@ -3,7 +3,10 @@ import HTTPStatusCodes from "http-status-codes";
 
 import RepositoriesController from "../controllers/RepositoriesController";
 
-import { createRepository } from "../schemas/RepositorySchema";
+import {
+  createRepository,
+  updateRepository,
+} from "../schemas/RepositorySchema";
 import validateRequestMiddleware from "../middlewares/validate-request-middleware";
 
 class RepositoriesRoutes {
@@ -24,9 +27,14 @@ class RepositoriesRoutes {
       RepositoriesControllerInstance.createRepository
     );
     this.mainRoutes.get("/", RepositoriesControllerInstance.listRepositories);
-    this.mainRoutes.put("/:repository_id", (req, res) => {
-      return res.status(HTTPStatusCodes.OK).send();
-    });
+    this.mainRoutes.put(
+      "/:repository_id",
+      [
+        validateRequestMiddleware(updateRepository, "params"),
+        validateRequestMiddleware(updateRepository, "body"),
+      ],
+      RepositoriesControllerInstance.updateRepository
+    );
     this.mainRoutes.delete("/:repository_id", (req, res) => {
       return res.status(HTTPStatusCodes.NO_CONTENT).send();
     });

@@ -9,6 +9,9 @@ const selectsSqls: ISelectsSqls = {
   SELECT_REPOSITORIES: `
     SELECT * FROM ${databaseTables.repositories};
   `,
+  SELECT_REPOSITORY_BY_ID: `
+    SELECT * FROM ${databaseTables.repositories} WHERE id = ?;
+  `,
   SELECT_COUNT_LIKES_BY_REPOSITORY_ID: `
     SELECT count(id) total FROM ${databaseTables.likes} WHERE repository_id = ?;
   `,

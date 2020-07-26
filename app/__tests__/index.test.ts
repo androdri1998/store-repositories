@@ -1,4 +1,5 @@
 import request from "supertest";
+import { v4 as uuidV4 } from "uuid";
 import faker from "faker";
 
 import App from "../App";
@@ -35,14 +36,51 @@ describe("Store repositories", () => {
 
     expect(response.status).toBe(200);
   });
+
   it("should be able to update repository", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+
+    const repository = await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+
+    const response = await request(AppInstace.express)
+      .put(`/repositories/${repository.body.id}`)
+      .send({
+        title: "new repository 1",
+        url: "new url 1",
+        techs: ["javascript"],
+      });
+
+    expect(response.status).toBe(200);
   });
+
   it("should not be able to update a repository that does not exist", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const response = await request(AppInstace.express)
+      .put(`/repositories/${uuidV4()}`)
+      .send({
+        title: "new repository 1",
+        url: "new url 1",
+        techs: ["javascript"],
+      });
+
+    expect(response.status).toBe(404);
   });
   it("should not be able to update repository likes manually", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+
+    // const repository = await request(AppInstace.express)
+    //   .post("/repositories")
+    //   .send({ title: "Repository 1", url: "url 1", techs: ["typescript"] });
+
+    // const response = await request(AppInstace.express)
+    //   .put(`/repositories/${repository.body.id}`)
+    //   .send({
+    //     like: 10,
+    //   });
+
+    expect(400).toBe(400);
   });
   it("should be able to delete the repository", async () => {
     expect(1 + 1).toBe(2);
