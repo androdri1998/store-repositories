@@ -10,8 +10,14 @@ describe("Store repositories", () => {
   });
 
   it("should be able to create a new repository", async () => {
-    expect(1 + 1).toBe(2);
+    const AppInstace = new App();
+    const response = await request(AppInstace.express)
+      .post("/repositories")
+      .send({ title: "Test title", url: "url test", techs: ["tech"] });
+
+    expect(response.status).toBe(201);
   });
+
   it("should be able to list the repositories", async () => {
     expect(1 + 1).toBe(2);
   });

@@ -2,8 +2,10 @@ import Database from "../database/Database";
 import selectsSqls from "../sqls/selects";
 import deletesSqls from "../sqls/deletes";
 
+import { IDatabaseRepository } from "./DatabaseRepository-types";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-class DatabaseRepository {
+class DatabaseRepository implements IDatabaseRepository {
   public async query(
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     CONN: any,

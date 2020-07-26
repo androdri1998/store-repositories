@@ -1,6 +1,9 @@
 import express from "express";
 import HTTPStatusCodes from "http-status-codes";
 
+import RepositoriesController from "../controllers/RepositoriesController";
+
+import { createRepository } from "../schemas/RepositorySchema";
 import validateRequestMiddleware from "../middlewares/validate-request-middleware";
 
 class RepositoriesRoutes {
@@ -13,9 +16,13 @@ class RepositoriesRoutes {
   }
 
   private routes(): void {
-    this.mainRoutes.post("/", (req, res) => {
-      return res.status(HTTPStatusCodes.CREATED).send();
-    });
+    const RepositoriesControllerInstance = new RepositoriesController();
+
+    this.mainRoutes.post(
+      "/",
+      validateRequestMiddleware(createRepository, "body"),
+      RepositoriesControllerInstance.createRepository
+    );
     this.mainRoutes.get("/", (req, res) => {
       return res.status(HTTPStatusCodes.OK).send();
     });
